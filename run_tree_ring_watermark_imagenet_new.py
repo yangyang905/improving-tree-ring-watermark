@@ -183,14 +183,7 @@ def main(args):
         wandb.log({'auc': auc, 'acc':acc, 'TPR@1%FPR': low})
         
     print(f'auc: {auc}, acc: {acc}, TPR@1%FPR: {low}')
-
-    with open("note.txt", "w+") as f:
-        for m in no_w_metrics:
-            f.write(f"{m:.2f} ")
-        f.write("\n")
-        for m in w_metrics:
-            f.write(f"{m:.2f} ")
-        f.write("\n")
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='diffusion watermark')
