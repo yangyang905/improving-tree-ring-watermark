@@ -148,6 +148,7 @@ def main(args):
         wandb.log({'auc': auc, 'acc':acc, 'TPR@1%FPR': low})
         
     print(f'auc: {auc}, acc: {acc}, TPR@1%FPR: {low}')
+    print(mean(no_w_metrics), mean(w_metrics))
 
 
 if __name__ == '__main__':

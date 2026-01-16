@@ -1,3 +1,4 @@
+import os
 import torch
 from torchvision import transforms
 from datasets import load_dataset
@@ -51,10 +52,11 @@ def image_distortion(img1, img2, seed, args):
         img2 = transforms.RandomRotation((args.r_degree, args.r_degree))(img2)
 
     if args.jpeg_ratio is not None:
-        img1.save(f"tmp_{args.jpeg_ratio}_{args.run_name}.jpg", quality=args.jpeg_ratio)
-        img1 = Image.open(f"tmp_{args.jpeg_ratio}_{args.run_name}.jpg")
-        img2.save(f"tmp_{args.jpeg_ratio}_{args.run_name}.jpg", quality=args.jpeg_ratio)
-        img2 = Image.open(f"tmp_{args.jpeg_ratio}_{args.run_name}.jpg")
+        os.makedirs(f"jpeg/{os.getpid()}", exist_ok=True)
+        img1.save(f"jpeg/{os.getpid()}/tmp_{args.jpeg_ratio}_{args.run_name}_1.jpg", quality=args.jpeg_ratio)
+        img1 = Image.open(f"jpeg/{os.getpid()}/tmp_{args.jpeg_ratio}_{args.run_name}_1.jpg")
+        img2.save(f"jpeg/{os.getpid()}/tmp_{args.jpeg_ratio}_{args.run_name}_2.jpg", quality=args.jpeg_ratio)
+        img2 = Image.open(f"jpeg/{os.getpid()}/tmp_{args.jpeg_ratio}_{args.run_name}_2.jpg")
 
     if args.crop_scale is not None and args.crop_ratio is not None:
         set_random_seed(seed)
@@ -223,6 +225,7 @@ def eval_watermark(reversed_latents_no_w, reversed_latents_w, watermarking_mask,
     if 'l1' in args.w_measurement:
         no_w_metric = torch.abs(reversed_latents_no_w_fft[watermarking_mask] - target_patch[watermarking_mask]).mean().item()
         w_metric = torch.abs(reversed_latents_w_fft[watermarking_mask] - target_patch[watermarking_mask]).mean().item()
+        print(no_w_metric, w_metric)
     else:
         NotImplementedError(f'w_measurement: {args.w_measurement}')
 

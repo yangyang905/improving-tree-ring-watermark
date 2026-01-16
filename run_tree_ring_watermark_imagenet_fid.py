@@ -200,6 +200,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     args.__dict__.update(model_and_diffusion_defaults())
-    args.__dict__.update(read_json(f"openai_config/{args.model_id}.json"))
+    args.__dict__.update(read_json(f"{args.model_id}.json"))
 
     main(args)

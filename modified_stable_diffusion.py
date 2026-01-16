@@ -26,6 +26,7 @@ class ModifiedStableDiffusionPipeline(StableDiffusionPipeline):
         scheduler,
         safety_checker,
         feature_extractor,
+        image_encoder = None,
         requires_safety_checker: bool = True,
     ):
         super(ModifiedStableDiffusionPipeline, self).__init__(vae,
@@ -35,7 +36,8 @@ class ModifiedStableDiffusionPipeline(StableDiffusionPipeline):
                 scheduler,
                 safety_checker,
                 feature_extractor,
-                requires_safety_checker)
+                image_encoder=image_encoder,
+                requires_safety_checker=requires_safety_checker if safety_checker is not None else False)
 
     @torch.no_grad()
     def __call__(
