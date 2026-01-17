@@ -1,0 +1,3 @@
+[submodule "deps/wam"]
+	path = deps/wam
+	url = https://github.com/facebookresearch/watermark-anything.git
