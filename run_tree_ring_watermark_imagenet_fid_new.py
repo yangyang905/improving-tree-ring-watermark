@@ -19,6 +19,7 @@ from guided_diffusion.script_util import (
 from optim_utils import *
 from io_utils import *
 from pytorch_fid.fid_score import *
+from tree_ring_watermark.sync.factory import get_sync_model
 
 
 def main(args):
@@ -111,7 +112,10 @@ def main(args):
         )
         orig_image_ws = outputs_w
 
-        scripted = torch.jit.load("syncmodel.jit.pt").to(device).eval()
+        synctype = args.synctype
+        syncpath = args.syncpath
+        sync_model = get_sync_model(synctype, syncpath, device)
+        # scripted = torch.jit.load("syncmodel.jit.pt").to(device).eval()
 
         for j in range(len(orig_image_ws)):
             if orig_image_no_ws is None:
@@ -124,8 +128,9 @@ def main(args):
             # embedding
             orig_tensor_w = to_tensor(orig_image_w).unsqueeze(0).to(device)
             with torch.no_grad():
-                emb = scripted.embed(orig_tensor_w)
-            orig_image_w = to_pil_image(emb["imgs_w"].squeeze().cpu())
+                embedded_image = sync_model.add_sync(2.0 * orig_tensor_w - 1.0)
+                embedded_image = (embedded_image + 1.0) / 2.0
+            orig_image_w = to_pil_image(embedded_image.squeeze().cpu())
 
             if args.with_tracking:
                 if counter < args.max_num_log_image:
@@ -207,6 +212,10 @@ if __name__ == "__main__":
     parser.add_argument("--w_measurement", default="l1_complex")
     parser.add_argument("--w_injection", default="complex")
     parser.add_argument("--w_pattern_const", default=0, type=float)
+
+    # sync model
+    parser.add_argument('--synctype', default='wam', type=str, help='sync model type')
+    parser.add_argument('--syncpath', required=True, type=str, help='path to sync model')
 
     args = parser.parse_args()
 
